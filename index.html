@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Barcode Scanner</title>
+  <style>
+    video {
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 3/4;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+    }
+    #result {
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h2>Scan Barcode (All Formats)</h2>
+  <video id="video" autoplay muted playsinline></video>
+  <div id="result">Initializing...</div>
+<script src="https://unpkg.com/@zxing/library@latest"></script>
+  <script>
+    const codeReader = new ZXing.BrowserMultiFormatReader();
+    const videoElement = document.getElementById('video');
+    const resultElement = document.getElementById('result');
+    async function startScanner() {
+      try {
+        await codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
+          if (result) {
+            const rawText = result.getText();
+            const convertedText = rawText.replace(/\x1D/g, '='); 
+            resultElement.textContent = 'Scanned:\n' + convertedText;
+          } else if (err && !(err instanceof ZXing.NotFoundException)) {
+            resultElement.textContent = 'Error: ' + err;
+          }
+        });
+      } catch (err) {
+        resultElement.textContent = 'Camera access error: ' + err.message;
+      }
+    }
+    startScanner();
+  </script>
+</body>
+</html>
