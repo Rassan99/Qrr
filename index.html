@@ -22,17 +22,19 @@
   <h2>Scan Barcode (All Formats)</h2>
   <video id="video" autoplay muted playsinline></video>
   <div id="result">Initializing...</div>
-<script src="https://unpkg.com/@zxing/library@latest"></script>
+ 
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
   <script>
     const codeReader = new ZXing.BrowserMultiFormatReader();
     const videoElement = document.getElementById('video');
     const resultElement = document.getElementById('result');
+ 
     async function startScanner() {
       try {
         await codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
           if (result) {
             const rawText = result.getText();
-            const convertedText = rawText.replace(/\x1D/g, '='); 
+            const convertedText = rawText.replace(/\x1D/g, '=').replace(/^=/, '');
             resultElement.textContent = 'Scanned:\n' + convertedText;
           } else if (err && !(err instanceof ZXing.NotFoundException)) {
             resultElement.textContent = 'Error: ' + err;
@@ -42,7 +44,9 @@
         resultElement.textContent = 'Camera access error: ' + err.message;
       }
     }
+ 
     startScanner();
   </script>
 </body>
 </html>
+ 
